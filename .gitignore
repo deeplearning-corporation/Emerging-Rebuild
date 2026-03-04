@@ -1,34 +1,948 @@
-# Gradle files
-.gradle/
+# 忽略编译生成的可执行文件
+*.exe
+*.out
+*.app
+
+# 忽略目标文件
+*.obj
+*.o
+*.ko
+*.lib
+*.dll
+*.so
+*.dylib
+
+# 忽略编译器生成的文件
+emerging.exe
+emerging
+linker.exe
+linker
+*.ilk
+*.pdb
+*.idb
+*.pch
+*.exp
+*.manifest
+
+# 忽略运行时库目标文件
+lib/runtime/*.obj
+lib/runtime/*.o
+lib/obj/
+
+# 忽略测试程序
+hello-world.exe
+hello-world
+*.emg.exe
+*.emg.out
+
+# 忽略 Visual Studio 相关文件
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.tmp
+*.vcxproj.tlog
+Debug/
+Release/
+x64/
+x86/
+Win32/
+
+# 忽略 Code::Blocks 相关文件
+*.cbp
+*.depend
+*.layout
+*.workspace
+
+# 忽略 Eclipse 相关文件
+.cproject
+.project
+.settings/
+.classpath
+
+# 忽略 CLion 相关文件
+.idea/
+cmake-build-*/
+
+# 忽略 VS Code 相关文件
+.vscode/
+*.code-workspace
+
+# 忽略备份文件
+*~
+*.bak
+*.swp
+*.swo
+*.tmp
+
+# 忽略日志文件
+*.log
+*.err
+*.out
+*.output
+
+# 忽略构建目录
+build/
+bin/
+obj/
+dist/
+release/
+debug/
+
+# 忽略标签文件
+tags
+TAGS
+GTAGS
+GRTAGS
+GPATH
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# 忽略 IDE/编辑器配置文件
+*.user
+*.dot
+*.dsw
+*.ncb
+*.suo
+*.sdf
+*.opendb
+*.opensdf
+*.orig
+
+# 忽略编译临时文件
+*.i
+*.ii
+*.s
+*.S
+*.lst
+
+# 忽略依赖文件
+*.d
+*.dep
+
+# 忽略存档文件
+*.zip
+*.tar
+*.gz
+*.bz2
+*.rar
+*.7z
+
+# 忽略文档生成
+docs/_build/
+docs/api/
+
+# 忽略测试输出
+tests/output/
+tests/tmp/
+tests/*.diff
+tests/*.log
+
+# 忽略个人配置文件
+*.local
+*.private
+.env
+.config
+
+# 忽略生成的文档
+doc/html/
+doc/latex/
+doc/man/
+
+# 忽略编译器的预编译头
+*.gch
+*.pch
+
+# 忽略 core dump 文件
+core
+core.*
+
+# 忽略特定平台的运行时库
+lib/runtime/*.dll
+lib/runtime/*.so
+lib/runtime/*.dylib
+
+# 忽略示例程序生成的文件
+using/*/*.exe
+using/*/*.obj
+using/*/*.o
+using/*/*.out
+
+# 保留 README 文件和源文件
+!**/*.md
+!**/*.emg
+!**/*.emh
+!**/*.cpp
+!**/*.asm
+!**/*.bat
+!**/*.sh
+
+# 保留必要的构建脚本
+!scripts/*.bat
+!scripts/*.sh
+!scripts/*.vbs
+
+# 保留许可证和版权文件
+LICENSE
+NOTICE
+AUTHORS
+COPYING
+
+# 保留配置文件（如果有）
+*.conf.example
+*.config.example
+
+# 忽略临时编辑器文件
+.*.swp
+.*.swo
+*~.nib
+
+# 忽略编译器的临时文件
+*.tlog
+*.lastbuildstate
+*.unsuccessfulbuild
+
+# 忽略资源文件备份
+*.res
+*.rsrc
+
+# 忽略 Windows 可执行文件的资源
+*.exe.manifest
+
+# 忽略版本控制目录
+.svn/
+CVS/
+.hg/
+.git/  # 注意：通常不忽略 .git 目录本身，但这里为了完整性列出
+
+# 忽略 npm/yarn 相关（如果有 Node.js 集成）
+node_modules/
+package-lock.json
+yarn.lock
+
+# 忽略 Python 相关（如果有 Python 集成）
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 忽略 Rust 相关（如果有 Rust 集成）
+target/
+Cargo.lock
+
+# 忽略 Go 相关（如果有 Go 集成）
+vendor/
+Gopkg.lock
+go.sum
+
+# 忽略 Vim 相关
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+
+# 忽略 Emacs 相关
+*#
+.#*
+\#*\#
+._*
+
+# 忽略 CMake 相关
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+CTestTestfile.cmake
+Testing/
+
+# 忽略 Doxygen 相关
+doxygen_sqlite3.db
+*.doxytag
+
+# 忽略特定项目的输出
+examples/output/
+demos/output/
+tutorials/output/
+
+# 忽略性能分析文件
+*.prof
+*.gcda
+*.gcno
+*.gcov
+*.callgrind
+*.cachegrind
+
+# 忽略内存转储
+*.dmp
+*.stackdump
+
+# 忽略快照文件
+*.snap
+*.sna
+
+# 忽略 Vagrant 相关
+.vagrant/
+Vagrantfile.local
+
+# 忽略 Docker 相关
+.dockerignore
+Dockerfile.local
+*.docker
+
+# 忽略持续集成配置（如果需要本地覆盖）
+.travis.yml.local
+.appveyor.yml.local
+.gitlab-ci.yml.local
+.circleci/config.yml.local
+.github/workflows/*.local
+
+# 忽略包管理器文件
+packages/
+*.nupkg
+*.gem
+*.egg
+*.egg-info/
+dist/
 build/
 
-# Local configuration file (sdk path, etc)
-local.properties
+# 忽略环境特定文件
+environment/
+venv/
+env/
+.venv/
+.envrc
+.direnv/
 
-# Log/OS Files
-*.log
+# 忽略 IDE 项目文件
+*.ide
+*.v11.suo
+*.v12.suo
+*.v13.suo
+*.v14.suo
+*.v15.suo
+*.v16.suo
+*.v17.suo
 
-# Android Studio generated files and folders
-captures/
-.externalNativeBuild/
-.cxx/
-*.aab
-*.apk
-output-metadata.json
+# 忽略数据库文件
+*.db
+*.sqlite
+*.sqlite3
+*.mdb
+*.accdb
 
-# IntelliJ
-*.iml
-.idea/
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
+# 忽略证书和密钥文件
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+*.keystore
 
-# Keystore files
+# 忽略 SSH 密钥
+id_rsa
+id_dsa
+*.pem
+
+# 忽略 API 密钥文件
+*.apikey
+*.secret
+*.token
+
+# 忽略测试覆盖率报告
+coverage/
+coverage.*
+*.lcov
+*.info
+
+# 忽略基准测试结果
+benchmarks/
+*.bench
+*.benchmark
+
+# 忽略内存分析结果
+memcheck.*
+valgrind.*
+*.massif
+*.out.perf
+
+# 忽略语法检查输出
+*.syntax
+*.lint
+
+# 忽略格式化工具备份
+*.formatted
+*.unformatted
+
+# 忽略合并冲突备份
+*.orig
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+
+# 忽略补丁文件
+*.patch
+*.diff
+
+# 忽略签名文件
+*.asc
+*.sig
+*.sha256
+*.md5
+
+# 忽略 Git 属性文件
+.gitattributes.local
+.gitignore.local
+
+# 忽略 CI 服务配置文件备份
+.gitlab-ci.yml.bak
+.travis.yml.bak
+appveyor.yml.bak
+
+# 忽略特定版本的构建输出
+output-*/
+release-*/
+debug-*/
+
+# 忽略 Visual Studio 的浏览器文件
+*.bsc
+*.sbr
+
+# 忽略 Visual Studio 的 IntelliSense 文件
+*.ipch
+*.iobj
+*.ipdb
+*.idt
+
+# 忽略 Windows 应用程序清单
+*.exe.intermediate.manifest
+*.dll.intermediate.manifest
+
+# 忽略资源编译器输出
+*.res
+*.rsrc
+
+# 忽略模块定义文件输出
+*.def
+*.exp
+
+# 忽略静态库
+*.lib
+*.a
+
+# 忽略动态库导入库
+*.dll.a
+*.dll.lib
+
+# 忽略响应文件
+*.rsp
+
+# 忽略预编译输出
+*.i
+*.ii
+*.s
+*.S
+
+# 忽略汇编列表
+*.lst
+*.cod
+
+# 忽略地图文件
+*.map
+
+# 忽略调试符号
+*.dbg
+*.sym
+
+# 忽略 profiling 数据
+*.pgd
+*.pgc
+*.pgopt
+*.pgo
+
+# 忽略链接器状态
+*.ilk
+*.pdb
+*.idb
+
+# 忽略编译数据库
+compile_commands.json
+compile_flags.txt
+
+# 忽略自定义构建脚本的备份
+*.sh~
+*.bat~
+*.vbs~
+*.ps1~
+
+# 忽略临时文档
+*.aux
+*.out
+*.toc
+*.lof
+*.lot
+*.bbl
+*.blg
+*.brf
+*.cb
+*.dvi
+*.fdb_latexmk
+*.fls
+*.idx
+*.ilg
+*.ind
+*.maf
+*.mtc
+*.mtc0
+*.nav
+*.snm
+*.synctex.gz
+*.xdv
+
+# 忽略自动生成的文档
+docs/generated/
+docs/html/
+docs/latex/
+docs/man/
+docs/rtf/
+docs/xml/
+
+# 忽略网站生成器输出
+_site/
+_public/
+public/
+assets/
+static/
+*.hugo
+*.jekyll
+*.hexo
+
+# 忽略笔记
+notes/
+*.note
+*.memo
+
+# 忽略 TODO 列表
+TODO.*
+*.todo
+
+# 忽略变更日志备份
+CHANGELOG.*.bak
+HISTORY.*.bak
+
+# 忽略版本文件
+version.*
+VERSION.*
+*.version
+
+# 忽略提交信息模板
+*.gitmessage
+*.commit_template
+
+# 忽略钩子脚本
+.hooks/
+*.hook
+*.git-hook
+
+# 忽略 IDE 的代码样式配置
+*.ide-settings
+*.code-style
+*.editorconfig.local
+
+# 忽略代码格式化配置
+.clang-format.local
+.prettierrc.local
+.editorconfig.local
+
+# 忽略 Linter 配置
+.eslintrc.local
+.jshintrc.local
+.tslint.json.local
+.pylintrc.local
+.flake8.local
+
+# 忽略类型检查配置
+*.pyre
+*.pytyped
+mypy.ini.local
+*.pylintrc.local
+
+# 忽略持续集成脚本的本地版本
+ci/*.local
+.circleci/*.local
+.github/*.local
+.gitlab/*.local
+
+# 忽略容器配置文件
+Dockerfile.local
+docker-compose.local.yml
+*.container
+*.containerfile
+
+# 忽略虚拟机配置
+Vagrantfile.local
+*.vagrant
+*.vbox
+*.vmx
+*.vmdk
+*.vdi
+
+# 忽略 WSL 配置
+.wslconfig.local
+*.wsl
+
+# 忽略 MinGW 配置
+mingw.ini.local
+*.mingw
+*.msys
+
+# 忽略 Cygwin 配置
+cygwin.ini.local
+*.cygwin
+
+# 忽略交叉编译配置
+cross-compile.*
+toolchain.*
+*.cmake.toolchain
+*.toolchain.cmake
+
+# 忽略配置文件备份
+*.conf.bak
+*.cfg.bak
+*.ini.bak
+*.config.bak
+
+# 忽略环境变量文件
+.env.*
+*.env
+*.environment
+
+# 忽略密钥环
+*.keyring
+*.keychain
+*.keystore
+*.jks
+*.p12
+*.pfx
+
+# 忽略密码文件
+*.pass
+*.password
+*.secret
+*.credential
+credentials.*
+*.auth
+
+# 忽略 API 令牌
+*.token
+*.apikey
+*.secretkey
+*.privatekey
+
+# 忽略 SSL/TLS 证书
+*.crt
+*.pem
+*.der
+*.p7b
+*.p7c
+*.p12
+*.pfx
 *.jks
 *.keystore
 
-# Google Services (e.g. APIs or Firebase)
-google-services.json
+# 忽略 SSH 配置
+.ssh/
+*.ssh
+*.pub
+*.priv
+*.ppk
+known_hosts
+authorized_keys
+id_*
+ssh_config
 
-# Android Profiling
-*.hprof
+# 忽略 GPG 密钥
+*.gpg
+*.pgp
+*.asc
+*.sig
+*.key
+
+# 忽略证书签名请求
+*.csr
+
+# 忽略证书吊销列表
+*.crl
+
+# 忽略网络安全服务数据库
+cert8.db
+cert9.db
+key3.db
+key4.db
+pkcs11.txt
+
+# 忽略 Windows 凭据管理器
+*.cred
+*.credential
+*.vault
+
+# 忽略 macOS 钥匙串
+*.keychain
+*.keychain-db
+
+# 忽略 Linux 密钥环
+*.keyring
+*.keytab
+
+# 忽略加密的配置文件
+*.enc
+*.encrypted
+*.gpg
+*.age
+*.asc
+
+# 忽略二进制数据文件
+*.bin
+*.dat
+*.data
+*.raw
+*.img
+*.iso
+*.dmg
+*.vhd
+*.vhdx
+*.vmdk
+*.qcow2
+*.vdi
+
+# 忽略多媒体文件
+*.mp3
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.webm
+*.mkv
+*.m4a
+*.aac
+*.wav
+*.flac
+*.ogg
+
+# 忽略图像文件
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.webp
+*.ico
+*.svg
+*.psd
+*.xcf
+
+# 忽略字体文件
+*.ttf
+*.otf
+*.woff
+*.woff2
+*.eot
+
+# 忽略文档文件
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+*.ppt
+*.pptx
+*.odt
+*.ods
+*.odp
+
+# 忽略压缩文件
+*.zip
+*.tar
+*.gz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.iso
+
+# 忽略磁盘映像
+*.dmg
+*.iso
+*.img
+*.vhd
+*.vhdx
+*.vmdk
+
+# 忽略虚拟机快照
+*.vmsn
+*.vmsd
+*.nvram
+*.vmss
+
+# 忽略 Docker 镜像层
+*.tar.gzip
+*.docker.layer
+
+# 忽略 Vagrant box
+*.box
+*.vagrant.box
+
+# 忽略安装包
+*.msi
+*.exe
+*.msm
+*.msp
+*.appx
+*.appxbundle
+*.deb
+*.rpm
+*.pkg
+*.dmg
+
+# 忽略源代码包
+*.src.rpm
+*.src.tar.gz
+*.orig.tar.gz
+*.debian.tar.gz
+
+# 忽略补丁文件
+*.patch
+*.diff
+*.delta
+
+# 忽略版本控制元数据
+.svn/
+.git/
+.hg/
+.bzr/
+CVS/
+_Root
+_RCS
+_SCCS
+
+# 忽略备份目录
+backup/
+Backup/
+BACKUP/
+backups/
+Backups/
+BACKUPS/
+
+# 忽略存档目录
+archive/
+Archive/
+ARCHIVE/
+old/
+Old/
+OLD/
+legacy/
+Legacy/
+LEGACY/
+
+# 忽略临时目录
+temp/
+Temp/
+TEMP/
+tmp/
+Tmp/
+TMP/
+cache/
+Cache/
+CACHE/
+
+# 忽略日志目录
+logs/
+Logs/
+LOGS/
+log/
+Log/
+LOG/
+
+# 忽略输出目录
+out/
+Out/
+OUT/
+output/
+Output/
+OUTPUT/
+build/
+Build/
+BUILD/
+dist/
+Dist/
+DIST/
+release/
+Release/
+RELEASE/
+debug/
+Debug/
+DEBUG/
+
+# 忽略测试输出
+test-output/
+Test-Output/
+test_output/
+TEST_OUTPUT/
+test-results/
+Test-Results/
+TEST_RESULTS/
+
+# 忽略文档输出
+doc-out/
+doc_output/
+documentation-output/
+generated-docs/
+
+# 忽略 IDE 配置目录
+.idea/
+.vscode/
+.vscode-insiders/
+.ensime/
+.project
+.classpath
+.settings/
+.nbproject/
+.metadata/
+.ropeproject/
+.pydevproject/
+.cproject
+
+# 忽略编辑器交换文件
+*.swp
+*.swo
+*.swn
+*.bak
+*~
+.*~
+\#*\#
+*\#.*\#
+
+# 忽略操作系统特定文件
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
