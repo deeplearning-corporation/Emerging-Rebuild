@@ -1,0 +1,51 @@
+// sys/api.emh - 通用系统API接口
+
+// 系统调用号（平台相关）
+#ifdef _WIN32
+    // Windows系统调用（通过API）
+    int GetStdHandle(int nStdHandle);
+    int WriteConsoleA(int hConsoleOutput, void* lpBuffer, int nNumberOfCharsToWrite, int* lpNumberOfCharsWritten, void* lpReserved);
+    int ReadConsoleA(int hConsoleInput, void* lpBuffer, int nNumberOfCharsToRead, int* lpNumberOfCharsRead, void* lpReserved);
+    int CreateFileA(char* lpFileName, int dwDesiredAccess, int dwShareMode, void* lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, int hTemplateFile);
+    int WriteFile(int hFile, void* lpBuffer, int nNumberOfBytesToWrite, int* lpNumberOfBytesWritten, void* lpOverlapped);
+    int ReadFile(int hFile, void* lpBuffer, int nNumberOfBytesToRead, int* lpNumberOfBytesRead, void* lpOverlapped);
+    int CloseHandle(int hObject);
+    void ExitProcess(int uExitCode);
+    void* HeapAlloc(int hHeap, int dwFlags, int dwBytes);
+    int HeapFree(int hHeap, int dwFlags, void* lpMem);
+    int GetProcessHeap();
+    int Sleep(int dwMilliseconds);
+    int GetTickCount();
+    
+#elif __linux__
+    // Linux系统调用号
+    const int SYS_READ = 0;
+    const int SYS_WRITE = 1;
+    const int SYS_OPEN = 2;
+    const int SYS_CLOSE = 3;
+    const int SYS_EXIT = 60;
+    const int SYS_BRK = 12;
+    const int SYS_TIME = 201;
+    const int SYS_NANOSLEEP = 162;
+    const int SYS_GETPID = 39;
+    const int SYS_FORK = 57;
+    const int SYS_EXECVE = 59;
+    
+#elif __APPLE__
+    // macOS系统调用号
+    const int SYS_READ = 0x2000003;
+    const int SYS_WRITE = 0x2000004;
+    const int SYS_OPEN = 0x2000005;
+    const int SYS_CLOSE = 0x2000006;
+    const int SYS_EXIT = 0x2000001;
+    const int SYS_BRK = 0x200002d;
+    const int SYS_GETTIMEOFDAY = 0x2000074;
+    const int SYS_NANOSLEEP = 0x20000c3;
+    
+#endif
+
+// 系统调用函数声明
+int syscall0(int number);
+int syscall1(int number, int arg1);
+int syscall2(int number, int arg1, int arg2);
+int syscall3(int number, int arg1, int arg2, int arg3);

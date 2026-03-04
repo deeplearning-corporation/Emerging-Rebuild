@@ -1,0 +1,144 @@
+// memory.emh - 内存管理函数
+
+// 内存块结构
+struct mem_block {
+    int size;
+    int used;
+    struct mem_block* next;
+    struct mem_block* prev;
+};
+
+static void* heap_base = NULL;
+static struct mem_block* free_list = NULL;
+
+// 初始化内存分配器
+void mem_init(void* heap, int size)
+{
+    heap_base = heap;
+    free_list = (struct mem_block*)heap;
+    free_list->size = size - sizeof(struct mem_block);
+    free_list->used = 0;
+    free_list->next = NULL;
+    free_list->prev = NULL;
+}
+
+// 内存分配
+void* malloc(int size)
+{
+    // 对齐到8字节
+    size = (size + 7) & ~7;
+    
+    struct mem_block* curr = free_list;
+    struct mem_block* best = NULL;
+    int best_size = -1;
+    
+    // 查找最佳适配块
+    while (curr != NULL) {
+        if (!curr->used && curr->size >= size) {
+            if (best == NULL || curr->size < best_size) {
+                best = curr;
+                best_size = curr->size;
+            }
+        }
+        curr = curr->next;
+    }
+    
+    if (best == NULL) return NULL;
+    
+    // 如果块太大，分割它
+    if (best->size >= size + sizeof(struct mem_block) + 8) {
+        struct mem_block* new_block = (struct mem_block*)((char*)best + sizeof(struct mem_block) + size);
+        new_block->size = best->size - size - sizeof(struct mem_block);
+        new_block->used = 0;
+        new_block->next = best->next;
+        new_block->prev = best;
+        
+        if (best->next != NULL) {
+            best->next->prev = new_block;
+        }
+        
+        best->next = new_block;
+        best->size = size;
+    }
+    
+    best->used = 1;
+    return (void*)((char*)best + sizeof(struct mem_block));
+}
+
+// 内存释放
+void free(void* ptr)
+{
+    if (ptr == NULL) return;
+    
+    struct mem_block* block = (struct mem_block*)((char*)ptr - sizeof(struct mem_block));
+    block->used = 0;
+    
+    // 合并相邻空闲块
+    if (block->next != NULL && !block->next->used) {
+        block->size = block->size + sizeof(struct mem_block) + block->next->size;
+        block->next = block->next->next;
+        if (block->next != NULL) {
+            block->next->prev = block;
+        }
+    }
+    
+    if (block->prev != NULL && !block->prev->used) {
+        block->prev->size = block->prev->size + sizeof(struct mem_block) + block->size;
+        block->prev->next = block->next;
+        if (block->next != NULL) {
+            block->next->prev = block->prev;
+        }
+    }
+}
+
+// 内存拷贝
+void* memcpy(void* dest, void* src, int n)
+{
+    char* d = (char*)dest;
+    char* s = (char*)src;
+    int i;
+    
+    // 处理重叠区域
+    if (d > s && d < s + n) {
+        for (i = n - 1; i >= 0; i--) {
+            d[i] = s[i];
+        }
+    } else {
+        for (i = 0; i < n; i++) {
+            d[i] = s[i];
+        }
+    }
+    
+    return dest;
+}
+
+// 内存设置
+void* memset(void* ptr, int value, int n)
+{
+    char* p = (char*)ptr;
+    int i;
+    for (i = 0; i < n; i++) {
+        p[i] = (char)value;
+    }
+    return ptr;
+}
+
+// 内存比较
+int memcmp(void* ptr1, void* ptr2, int n)
+{
+    char* p1 = (char*)ptr1;
+    char* p2 = (char*)ptr2;
+    int i;
+    
+    for (i = 0; i < n; i++) {
+        if (p1[i] != p2[i]) return p1[i] - p2[i];
+    }
+    
+    return 0;
+}
+
+// 内存移动
+void* memmove(void* dest, void* src, int n)
+{
+    return memcpy(dest, src, n);  // memcpy 已处理重叠
+}

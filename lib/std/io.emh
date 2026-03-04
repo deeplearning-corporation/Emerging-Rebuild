@@ -1,0 +1,102 @@
+// io.emh - 输入输出函数
+
+// 基础输出
+void putchar(char c)
+{
+    print_char(c);
+}
+
+char getchar()
+{
+    char c;
+    read(0, &c, 1);
+    return c;
+}
+
+void puts(char* str)
+{
+    println(str);
+}
+
+void printf(char* format, ...)
+{
+    // 简化实现，仅支持 %d, %s, %c
+    int* arg = &format + 1;
+    int i = 0;
+    
+    while (format[i] != 0) {
+        if (format[i] == '%' && format[i + 1] != 0) {
+            i++;
+            if (format[i] == 'd') {
+                print_int(*arg);
+                arg++;
+            } else if (format[i] == 's') {
+                print((char*)*arg);
+                arg++;
+            } else if (format[i] == 'c') {
+                print_char((char)*arg);
+                arg++;
+            } else if (format[i] == '%') {
+                print_char('%');
+            }
+        } else {
+            print_char(format[i]);
+        }
+        i++;
+    }
+}
+
+// 格式化输出到字符串
+int sprintf(char* buffer, char* format, ...)
+{
+    int* arg = &format + 1;
+    int i = 0;
+    int pos = 0;
+    
+    while (format[i] != 0) {
+        if (format[i] == '%' && format[i + 1] != 0) {
+            i++;
+            if (format[i] == 'd') {
+                char num[12];
+                int j = 0;
+                int num_val = *arg;
+                int is_neg = 0;
+                
+                if (num_val < 0) {
+                    is_neg = 1;
+                    num_val = -num_val;
+                }
+                
+                do {
+                    num[j++] = '0' + (num_val % 10);
+                    num_val = num_val / 10;
+                } while (num_val > 0);
+                
+                if (is_neg) num[j++] = '-';
+                
+                while (j > 0) {
+                    buffer[pos++] = num[--j];
+                }
+                arg++;
+            } else if (format[i] == 's') {
+                char* s = (char*)*arg;
+                int k = 0;
+                while (s[k] != 0) {
+                    buffer[pos++] = s[k++];
+                }
+                arg++;
+            } else if (format[i] == 'c') {
+                buffer[pos++] = (char)*arg;
+                arg++;
+            } else if (format[i] == '%') {
+                buffer[pos++] = '%';
+            }
+        } else {
+            buffer[pos++] = format[i];
+        }
+        i++;
+    }
+    
+    buffer[pos] = 0;
+    return pos;
+}

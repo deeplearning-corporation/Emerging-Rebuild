@@ -1,0 +1,133 @@
+// sys/windows/syscall.emh - Windows系统调用封装
+
+// Windows API 声明
+int GetStdHandle(int nStdHandle)
+{
+    int result;
+    asm volatile (
+        "push %0\n"
+        "call _GetStdHandle@4\n"
+        : "=r" (result)
+        : "r" (nStdHandle)
+    );
+    return result;
+}
+
+int WriteConsoleA(int hConsoleOutput, void* lpBuffer, int nNumberOfCharsToWrite, int* lpNumberOfCharsWritten, void* lpReserved)
+{
+    int result;
+    asm volatile (
+        "push %4\n"
+        "push %3\n"
+        "push %2\n"
+        "push %1\n"
+        "push %0\n"
+        "call _WriteConsoleA@20\n"
+        : "=r" (result)
+        : "r" (hConsoleOutput), "r" (lpBuffer), "r" (nNumberOfCharsToWrite), 
+          "r" (lpNumberOfCharsWritten), "r" (lpReserved)
+    );
+    return result;
+}
+
+int CreateFileA(char* lpFileName, int dwDesiredAccess, int dwShareMode, void* lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, int hTemplateFile)
+{
+    int result;
+    asm volatile (
+        "push %6\n"
+        "push %5\n"
+        "push %4\n"
+        "push %3\n"
+        "push %2\n"
+        "push %1\n"
+        "push %0\n"
+        "call _CreateFileA@28\n"
+        : "=r" (result)
+        : "r" (lpFileName), "r" (dwDesiredAccess), "r" (dwShareMode),
+          "r" (lpSecurityAttributes), "r" (dwCreationDisposition),
+          "r" (dwFlagsAndAttributes), "r" (hTemplateFile)
+    );
+    return result;
+}
+
+int CloseHandle(int hObject)
+{
+    int result;
+    asm volatile (
+        "push %0\n"
+        "call _CloseHandle@4\n"
+        : "=r" (result)
+        : "r" (hObject)
+    );
+    return result;
+}
+
+void ExitProcess(int uExitCode)
+{
+    asm volatile (
+        "push %0\n"
+        "call _ExitProcess@4\n"
+        :
+        : "r" (uExitCode)
+    );
+}
+
+void* HeapAlloc(int hHeap, int dwFlags, int dwBytes)
+{
+    void* result;
+    asm volatile (
+        "push %2\n"
+        "push %1\n"
+        "push %0\n"
+        "call _HeapAlloc@12\n"
+        : "=r" (result)
+        : "r" (hHeap), "r" (dwFlags), "r" (dwBytes)
+    );
+    return result;
+}
+
+int HeapFree(int hHeap, int dwFlags, void* lpMem)
+{
+    int result;
+    asm volatile (
+        "push %2\n"
+        "push %1\n"
+        "push %0\n"
+        "call _HeapFree@12\n"
+        : "=r" (result)
+        : "r" (hHeap), "r" (dwFlags), "r" (lpMem)
+    );
+    return result;
+}
+
+int GetProcessHeap()
+{
+    int result;
+    asm volatile (
+        "call _GetProcessHeap@0\n"
+        : "=r" (result)
+    );
+    return result;
+}
+
+int Sleep(int dwMilliseconds)
+{
+    int result;
+    asm volatile (
+        "push %0\n"
+        "call _Sleep@4\n"
+        : "=r" (result)
+        : "r" (dwMilliseconds)
+    );
+    return result;
+}
+
+int GetTickCount()
+{
+    int result;
+    asm volatile (
+        "call _GetTickCount@0\n"
+        : "=r" (result)
+    );
+    return result;
+}

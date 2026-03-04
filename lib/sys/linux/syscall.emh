@@ -1,0 +1,85 @@
+// sys/linux/syscall.emh - Linux系统调用封装
+
+// 系统调用函数（内联汇编）
+int syscall3(int number, int arg1, int arg2, int arg3)
+{
+    int result;
+    asm volatile (
+        "int $0x80"
+        : "=a" (result)
+        : "a" (number), "b" (arg1), "c" (arg2), "d" (arg3)
+        : "memory"
+    );
+    return result;
+}
+
+int syscall2(int number, int arg1, int arg2)
+{
+    return syscall3(number, arg1, arg2, 0);
+}
+
+int syscall1(int number, int arg1)
+{
+    return syscall3(number, arg1, 0, 0);
+}
+
+int syscall0(int number)
+{
+    return syscall3(number, 0, 0, 0);
+}
+
+// 特定系统调用封装
+int read(int fd, void* buf, int count)
+{
+    return syscall3(SYS_READ, fd, (int)buf, count);
+}
+
+int write(int fd, void* buf, int count)
+{
+    return syscall3(SYS_WRITE, fd, (int)buf, count);
+}
+
+int open(char* path, int flags, int mode)
+{
+    return syscall3(SYS_OPEN, (int)path, flags, mode);
+}
+
+int close(int fd)
+{
+    return syscall1(SYS_CLOSE, fd);
+}
+
+void exit(int status)
+{
+    syscall1(SYS_EXIT, status);
+}
+
+void* sbrk(int increment)
+{
+    void* result;
+    asm volatile (
+        "mov $12, %%eax\n"
+        "mov %1, %%ebx\n"
+        "int $0x80\n"
+        "mov %%eax, %0"
+        : "=r" (result)
+        : "r" (increment)
+        : "eax", "ebx"
+    );
+    return result;
+}
+
+long time()
+{
+    long result;
+    asm volatile (
+        "mov $13, %%eax\n"
+        "xor %%ebx, %%ebx\n"
+        "int $0x80\n"
+        "mov %%eax, %0"
+        : "=r" (result)
+        :
+        : "eax", "ebx"
+    );
+    return result;
+}

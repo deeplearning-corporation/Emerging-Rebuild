@@ -1,0 +1,55 @@
+// core.emh - Emerging 语言核心定义
+// 基本类型和常量
+
+// 基本类型别名
+typedef char int8;
+typedef short int16;
+typedef int int32;
+typedef long int64;
+
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef unsigned int uint32;
+typedef unsigned long uint64;
+
+typedef int size_t;
+typedef int ptrdiff_t;
+
+// 布尔类型
+const int true = 1;
+const int false = 0;
+
+// 空指针
+const int NULL = 0;
+
+// 标准错误码
+const int SUCCESS = 0;
+const int ERROR = -1;
+const int EINVAL = 22;      // 无效参数
+const int ENOMEM = 12;      // 内存不足
+const int EACCES = 13;      // 权限拒绝
+const int EEXIST = 17;      // 文件已存在
+const int ENOSYS = 38;      // 功能未实现
+
+// 断言宏
+void assert(int condition, char* message)
+{
+    if (condition == false) {
+        println("Assertion failed: ");
+        println(message);
+        exit(1);
+    }
+}
+
+// 最小值/最大值
+int min(int a, int b)
+{
+    if (a < b) return a;
+    return b;
+}
+
+int max(int a, int b)
+{
+    if (a > b) return a;
+    return b;
+}

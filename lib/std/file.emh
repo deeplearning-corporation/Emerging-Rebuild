@@ -1,0 +1,381 @@
+// file.emh - 文件操作函数
+
+// 文件打开模式
+const int O_RDONLY = 0x0000;
+const int O_WRONLY = 0x0001;
+const int O_RDWR   = 0x0002;
+const int O_CREAT  = 0x0100;
+const int O_TRUNC  = 0x0200;
+const int O_APPEND = 0x0400;
+const int O_EXCL   = 0x0800;
+
+// 文件权限
+const int S_IRWXU = 0x0700;
+const int S_IRUSR = 0x0400;
+const int S_IWUSR = 0x0200;
+const int S_IXUSR = 0x0100;
+const int S_IRWXG = 0x0070;
+const int S_IRGRP = 0x0040;
+const int S_IWGRP = 0x0020;
+const int S_IXGRP = 0x0010;
+const int S_IRWXO = 0x0007;
+const int S_IROTH = 0x0004;
+const int S_IWOTH = 0x0002;
+const int S_IXOTH = 0x0001;
+
+// 文件位置
+const int SEEK_SET = 0;
+const int SEEK_CUR = 1;
+const int SEEK_END = 2;
+
+// 文件状态结构
+struct stat {
+    int st_dev;      // 设备号
+    int st_ino;      // inode号
+    int st_mode;     // 文件类型和权限
+    int st_nlink;    // 硬链接数
+    int st_uid;      // 用户ID
+    int st_gid;      // 组ID
+    int st_rdev;     // 设备类型
+    int st_size;     // 文件大小
+    int st_atime;    // 最后访问时间
+    int st_mtime;    // 最后修改时间
+    int st_ctime;    // 最后状态改变时间
+};
+
+// 文件流结构
+struct FILE {
+    int fd;           // 文件描述符
+    int flags;        // 打开标志
+    int pos;          // 当前位置
+    int size;         // 缓冲区大小
+    char* buffer;     // 缓冲区
+    int buf_pos;      // 缓冲区位置
+    int buf_size;     // 缓冲区有效数据大小
+    int error;        // 错误标志
+    int eof;          // 文件结束标志
+};
+
+// 标准文件流
+struct FILE* stdin;
+struct FILE* stdout;
+struct FILE* stderr;
+
+// 初始化标准流
+void file_init()
+{
+    stdin = malloc(sizeof(struct FILE));
+    stdout = malloc(sizeof(struct FILE));
+    stderr = malloc(sizeof(struct FILE));
+    
+    stdin->fd = 0;
+    stdout->fd = 1;
+    stderr->fd = 2;
+    
+    stdin->flags = O_RDONLY;
+    stdout->flags = O_WRONLY;
+    stderr->flags = O_WRONLY;
+    
+    stdin->buffer = malloc(1024);
+    stdout->buffer = malloc(1024);
+    stderr->buffer = malloc(1024);
+    
+    stdin->size = 1024;
+    stdout->size = 1024;
+    stderr->size = 1024;
+    
+    stdin->buf_pos = 0;
+    stdout->buf_pos = 0;
+    stderr->buf_pos = 0;
+    
+    stdin->buf_size = 0;
+    stdout->buf_size = 0;
+    stderr->buf_size = 0;
+    
+    stdin->error = 0;
+    stdout->error = 0;
+    stderr->error = 0;
+    
+    stdin->eof = 0;
+    stdout->eof = 0;
+    stderr->eof = 0;
+}
+
+// 打开文件
+struct FILE* fopen(char* filename, char* mode)
+{
+    int flags = 0;
+    int creation = 0;
+    int i = 0;
+    
+    // 解析模式
+    while (mode[i] != 0) {
+        if (mode[i] == 'r') {
+            flags |= O_RDONLY;
+        } else if (mode[i] == 'w') {
+            flags |= O_WRONLY | O_CREAT | O_TRUNC;
+        } else if (mode[i] == 'a') {
+            flags |= O_WRONLY | O_CREAT | O_APPEND;
+        } else if (mode[i] == '+') {
+            flags = (flags & ~(O_RDONLY | O_WRONLY)) | O_RDWR;
+        } else if (mode[i] == 'b') {
+            // 二进制模式，Windows下需要，这里忽略
+        }
+        i++;
+    }
+    
+    int fd = open(filename, flags, 0644);
+    if (fd < 0) return NULL;
+    
+    struct FILE* file = malloc(sizeof(struct FILE));
+    file->fd = fd;
+    file->flags = flags;
+    file->pos = 0;
+    file->size = 4096;
+    file->buffer = malloc(file->size);
+    file->buf_pos = 0;
+    file->buf_size = 0;
+    file->error = 0;
+    file->eof = 0;
+    
+    return file;
+}
+
+// 关闭文件
+int fclose(struct FILE* stream)
+{
+    if (stream == NULL) return -1;
+    
+    // 刷新缓冲区
+    if (stream->flags & O_WRONLY || stream->flags & O_RDWR) {
+        if (stream->buf_pos > 0) {
+            write(stream->fd, stream->buffer, stream->buf_pos);
+        }
+    }
+    
+    free(stream->buffer);
+    int result = close(stream->fd);
+    free(stream);
+    
+    return result;
+}
+
+// 读取字符
+int fgetc(struct FILE* stream)
+{
+    if (stream->buf_pos >= stream->buf_size) {
+        // 缓冲区已空，读取更多数据
+        stream->buf_size = read(stream->fd, stream->buffer, stream->size);
+        stream->buf_pos = 0;
+        
+        if (stream->buf_size <= 0) {
+            stream->eof = 1;
+            return -1;
+        }
+    }
+    
+    unsigned char c = stream->buffer[stream->buf_pos++];
+    stream->pos++;
+    return c;
+}
+
+// 写入字符
+int fputc(int c, struct FILE* stream)
+{
+    if (stream->buf_pos >= stream->size) {
+        // 缓冲区已满，刷新
+        if (write(stream->fd, stream->buffer, stream->buf_pos) != stream->buf_pos) {
+            stream->error = 1;
+            return -1;
+        }
+        stream->buf_pos = 0;
+    }
+    
+    stream->buffer[stream->buf_pos++] = (char)c;
+    stream->pos++;
+    return c;
+}
+
+// 读取字符串
+char* fgets(char* str, int num, struct FILE* stream)
+{
+    int i = 0;
+    while (i < num - 1) {
+        int c = fgetc(stream);
+        if (c == -1) {
+            if (i == 0) return NULL;
+            break;
+        }
+        str[i++] = (char)c;
+        if (c == '\n') break;
+    }
+    str[i] = 0;
+    return str;
+}
+
+// 写入字符串
+int fputs(char* str, struct FILE* stream)
+{
+    int len = strlen(str);
+    int i;
+    for (i = 0; i < len; i++) {
+        if (fputc(str[i], stream) == -1) return -1;
+    }
+    return len;
+}
+
+// 格式化写入文件
+int fprintf(struct FILE* stream, char* format, ...)
+{
+    char buffer[4096];
+    int* arg = &format + 1;
+    int len = vsprintf(buffer, format, arg);
+    return fputs(buffer, stream);
+}
+
+// 刷新缓冲区
+int fflush(struct FILE* stream)
+{
+    if (stream->buf_pos > 0) {
+        int result = write(stream->fd, stream->buffer, stream->buf_pos);
+        if (result == stream->buf_pos) {
+            stream->buf_pos = 0;
+            return 0;
+        }
+        return -1;
+    }
+    return 0;
+}
+
+// 文件定位
+int fseek(struct FILE* stream, long offset, int origin)
+{
+    // 刷新缓冲区
+    if (stream->flags & O_WRONLY || stream->flags & O_RDWR) {
+        if (stream->buf_pos > 0) {
+            write(stream->fd, stream->buffer, stream->buf_pos);
+            stream->buf_pos = 0;
+        }
+    }
+    
+    // 清空读缓冲区
+    stream->buf_size = 0;
+    stream->buf_pos = 0;
+    
+    // 执行系统调用
+    return lseek(stream->fd, offset, origin);
+}
+
+// 获取当前位置
+long ftell(struct FILE* stream)
+{
+    return stream->pos;
+}
+
+// 判断文件结束
+int feof(struct FILE* stream)
+{
+    return stream->eof;
+}
+
+// 判断文件错误
+int ferror(struct FILE* stream)
+{
+    return stream->error;
+}
+
+// 删除文件
+int remove(char* filename)
+{
+    return unlink(filename);
+}
+
+// 重命名文件
+int rename(char* oldname, char* newname)
+{
+    return link(oldname, newname);
+}
+
+// 获取文件状态
+int stat(char* path, struct stat* buf)
+{
+#ifdef _WIN32
+    // Windows实现
+    return _stat(path, buf);
+#elif __linux__
+    // Linux系统调用
+    int result;
+    asm volatile (
+        "mov $106, %%eax\n"
+        "int $0x80\n"
+        : "=a" (result)
+        : "b" (path), "c" (buf)
+    );
+    return result;
+#elif __APPLE__
+    // macOS系统调用
+    int result;
+    asm volatile (
+        "mov $0x2000047, %%rax\n"
+        "syscall\n"
+        : "=a" (result)
+        : "D" (path), "S" (buf)
+    );
+    return result;
+#endif
+}
+
+// 检查文件是否存在
+int file_exists(char* filename)
+{
+    struct stat st;
+    return stat(filename, &st) == 0;
+}
+
+// 获取文件大小
+int file_size(char* filename)
+{
+    struct stat st;
+    if (stat(filename, &st) != 0) return -1;
+    return st.st_size;
+}
+
+// 读取整个文件
+char* read_file(char* filename)
+{
+    struct FILE* file = fopen(filename, "rb");
+    if (file == NULL) return NULL;
+    
+    fseek(file, 0, SEEK_END);
+    int size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+    
+    char* buffer = malloc(size + 1);
+    if (buffer == NULL) {
+        fclose(file);
+        return NULL;
+    }
+    
+    int read = fread(buffer, 1, size, file);
+    fclose(file);
+    
+    if (read != size) {
+        free(buffer);
+        return NULL;
+    }
+    
+    buffer[size] = 0;
+    return buffer;
+}
+
+// 写入整个文件
+int write_file(char* filename, char* data, int size)
+{
+    struct FILE* file = fopen(filename, "wb");
+    if (file == NULL) return -1;
+    
+    int written = fwrite(data, 1, size, file);
+    fclose(file);
+    
+    return written == size ? 0 : -1;
+}
