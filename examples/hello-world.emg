@@ -1,0 +1,7 @@
+use <iostream>
+
+int main()
+{
+ println("Hello, World");
+ ret
+}
