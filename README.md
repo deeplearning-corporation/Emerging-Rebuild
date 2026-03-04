@@ -27,7 +27,7 @@
 
 ## 我们的网站
 Deep Learning Corporation 官网：https://deeplearning-corporation.github.io
-Deep Learning Corporation 中的 Emerging 内容：https://deeplearning-corporation.github.io/emerging/index.html
+Deep Learning Corporation 中的 Emerging 内容：https://deeplearning-corporation.github.io\emerging\frontend\index.html
 
 ## 安装
 下载适用于 Windows x64 的安装程序：可在此 GitHub 仓库点击 Releases → 下载 emerging-win32-installer.exe
