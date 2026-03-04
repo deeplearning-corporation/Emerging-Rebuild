@@ -1,0 +1,144 @@
+// macos.emh - macOS 系统调用实现
+// macOS 使用不同的系统调用号（基于 BSD）
+
+// macOS 系统调用号（64位）
+const int SYS_READ = 0x2000003;
+const int SYS_WRITE = 0x2000004;
+const int SYS_OPEN = 0x2000005;
+const int SYS_CLOSE = 0x2000006;
+const int SYS_EXIT = 0x2000001;
+const int SYS_BRK = 0x200002d;
+const int SYS_GETPID = 0x2000014;
+const int SYS_FORK = 0x2000002;
+const int SYS_EXECVE = 0x2000003b;
+const int SYS_NANOSLEEP = 0x20000c3;
+const int SYS_GETTIMEOFDAY = 0x2000074;
+
+// 文件打开标志
+const int O_RDONLY = 0x0000;
+const int O_WRONLY = 0x0001;
+const int O_RDWR = 0x0002;
+const int O_CREAT = 0x0200;
+const int O_TRUNC = 0x0400;
+const int O_APPEND = 0x0008;
+
+// 标准文件描述符
+const int STDIN_FILENO = 0;
+const int STDOUT_FILENO = 1;
+const int STDERR_FILENO = 2;
+
+// macOS 使用不同的系统调用约定
+int syscall3(int number, int arg1, int arg2, int arg3)
+{
+    int result;
+    asm volatile (
+        "mov %1, %%rax\n"
+        "mov %2, %%rdi\n"
+        "mov %3, %%rsi\n"
+        "mov %4, %%rdx\n"
+        "syscall\n"
+        "mov %%rax, %0"
+        : "=r" (result)
+        : "r" (number), "r" (arg1), "r" (arg2), "r" (arg3)
+        : "rax", "rdi", "rsi", "rdx", "rcx", "r11", "memory"
+    );
+    return result;
+}
+
+// 文件操作
+int open(char* path, int flags, int mode)
+{
+    return syscall3(SYS_OPEN, (int)path, flags, mode);
+}
+
+int read(int fd, void* buf, int count)
+{
+    return syscall3(SYS_READ, fd, (int)buf, count);
+}
+
+int write(int fd, void* buf, int count)
+{
+    return syscall3(SYS_WRITE, fd, (int)buf, count);
+}
+
+int close(int fd)
+{
+    return syscall1(SYS_CLOSE, fd);
+}
+
+// 控制台输出
+void print(char* str)
+{
+    int len = strlen(str);
+    write(STDOUT_FILENO, str, len);
+}
+
+void println(char* str)
+{
+    print(str);
+    write(STDOUT_FILENO, "\n", 1);
+}
+
+// 内存管理
+void* heap_start = 0;
+void* heap_end = 0;
+
+void* malloc(int size)
+{
+    if (heap_start == 0) {
+        heap_start = (void*)syscall1(SYS_BRK, 0);
+        heap_end = heap_start;
+    }
+    
+    size = (size + 7) & ~7;
+    void* result = heap_end;
+    heap_end = (void*)((char*)heap_end + size);
+    syscall1(SYS_BRK, (int)heap_end);
+    
+    return result;
+}
+
+void free(void* ptr)
+{
+    // macOS 简单实现不释放
+}
+
+void exit(int status)
+{
+    syscall1(SYS_EXIT, status);
+}
+
+// 时间
+int sleep(int seconds)
+{
+    struct timespec {
+        long tv_sec;
+        long tv_nsec;
+    } req;
+    
+    req.tv_sec = seconds;
+    req.tv_nsec = 0;
+    
+    return syscall2(SYS_NANOSLEEP, (int)&req, 0);
+}
+
+long time()
+{
+    struct timeval {
+        long tv_sec;
+        long tv_usec;
+    } tv;
+    
+    syscall1(SYS_GETTIMEOFDAY, (int)&tv);
+    return tv.tv_sec;
+}
+
+// 字符串函数（同上）
+int strlen(char* str)
+{
+    int len = 0;
+    while (str[len] != 0) len++;
+    return len;
+}
+
+// ... 其他字符串函数相同

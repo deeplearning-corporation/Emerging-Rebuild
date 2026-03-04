@@ -1,0 +1,230 @@
+// windows.emh - Windows 系统调用实现
+// 使用 Win32 API
+
+// Windows 常量定义
+const int O_RDONLY = 0x0000;
+const int O_WRONLY = 0x0001;
+const int O_RDWR   = 0x0002;
+const int O_CREAT  = 0x0100;
+const int O_TRUNC  = 0x0200;
+const int O_APPEND = 0x0400;
+
+const int STD_INPUT_HANDLE  = -10;
+const int STD_OUTPUT_HANDLE = -11;
+const int STD_ERROR_HANDLE  = -12;
+
+// Windows API 函数声明（实际实现在运行时库中）
+int GetStdHandle(int nStdHandle);
+int WriteConsoleA(int hConsoleOutput, void* lpBuffer, int nNumberOfCharsToWrite, int* lpNumberOfCharsWritten, void* lpReserved);
+int ReadConsoleA(int hConsoleInput, void* lpBuffer, int nNumberOfCharsToRead, int* lpNumberOfCharsRead, void* lpReserved);
+int CreateFileA(char* lpFileName, int dwDesiredAccess, int dwShareMode, void* lpSecurityAttributes, int dwCreationDisposition, int dwFlagsAndAttributes, int hTemplateFile);
+int WriteFile(int hFile, void* lpBuffer, int nNumberOfBytesToWrite, int* lpNumberOfBytesWritten, void* lpOverlapped);
+int ReadFile(int hFile, void* lpBuffer, int nNumberOfBytesToRead, int* lpNumberOfBytesRead, void* lpOverlapped);
+int CloseHandle(int hObject);
+void ExitProcess(int uExitCode);
+int GetLastError();
+void* HeapAlloc(int hHeap, int dwFlags, int dwBytes);
+int HeapFree(int hHeap, int dwFlags, void* lpMem);
+int GetProcessHeap();
+void* VirtualAlloc(void* lpAddress, int dwSize, int flAllocationType, int flProtect);
+int VirtualFree(void* lpAddress, int dwSize, int dwFreeType);
+int Sleep(int dwMilliseconds);
+int GetTickCount();
+
+// 内存分配标志
+const int HEAP_ZERO_MEMORY = 0x00000008;
+const int MEM_COMMIT = 0x00001000;
+const int MEM_RESERVE = 0x00002000;
+const int MEM_RELEASE = 0x00008000;
+const int PAGE_READWRITE = 0x04;
+
+// 文件访问标志
+const int GENERIC_READ = 0x80000000;
+const int GENERIC_WRITE = 0x40000000;
+const int FILE_SHARE_READ = 0x00000001;
+const int CREATE_ALWAYS = 2;
+const int OPEN_EXISTING = 3;
+const int OPEN_ALWAYS = 4;
+const int FILE_ATTRIBUTE_NORMAL = 0x00000080;
+
+// Windows 特定实现
+int open(char* path, int flags, int mode)
+{
+    int access = 0;
+    int creation = OPEN_EXISTING;
+    
+    if (flags & O_RDWR) access = GENERIC_READ | GENERIC_WRITE;
+    else if (flags & O_WRONLY) access = GENERIC_WRITE;
+    else access = GENERIC_READ;
+    
+    if (flags & O_CREAT) creation = OPEN_ALWAYS;
+    if (flags & O_TRUNC) creation = CREATE_ALWAYS;
+    
+    return CreateFileA(path, access, FILE_SHARE_READ, 0, creation, FILE_ATTRIBUTE_NORMAL, 0);
+}
+
+int read(int fd, void* buf, int count)
+{
+    int bytesRead = 0;
+    if (ReadFile(fd, buf, count, &bytesRead, 0) == 0) return -1;
+    return bytesRead;
+}
+
+int write(int fd, void* buf, int count)
+{
+    int bytesWritten = 0;
+    if (WriteFile(fd, buf, count, &bytesWritten, 0) == 0) return -1;
+    return bytesWritten;
+}
+
+int close(int fd)
+{
+    return CloseHandle(fd);
+}
+
+void print(char* str)
+{
+    int hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    int len = strlen(str);
+    int written = 0;
+    WriteConsoleA(hStdout, str, len, &written, 0);
+}
+
+void println(char* str)
+{
+    print(str);
+    print_char('\n');
+}
+
+void print_int(int num)
+{
+    char buf[12];
+    int i = 0;
+    int is_negative = 0;
+    
+    if (num < 0) {
+        is_negative = 1;
+        num = -num;
+    }
+    
+    if (num == 0) {
+        buf[i++] = '0';
+    } else {
+        while (num > 0) {
+            buf[i++] = '0' + (num % 10);
+            num = num / 10;
+        }
+    }
+    
+    if (is_negative) {
+        buf[i++] = '-';
+    }
+    
+    // 反转字符串
+    int j;
+    for (j = 0; j < i / 2; j++) {
+        char temp = buf[j];
+        buf[j] = buf[i - 1 - j];
+        buf[i - 1 - j] = temp;
+    }
+    
+    buf[i] = 0;
+    print(buf);
+}
+
+void print_char(char c)
+{
+    int hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    int written = 0;
+    WriteConsoleA(hStdout, &c, 1, &written, 0);
+}
+
+void* malloc(int size)
+{
+    int hHeap = GetProcessHeap();
+    return HeapAlloc(hHeap, HEAP_ZERO_MEMORY, size);
+}
+
+void free(void* ptr)
+{
+    int hHeap = GetProcessHeap();
+    HeapFree(hHeap, 0, ptr);
+}
+
+void* memset(void* ptr, int value, int num)
+{
+    char* p = (char*)ptr;
+    int i;
+    for (i = 0; i < num; i++) {
+        p[i] = (char)value;
+    }
+    return ptr;
+}
+
+void* memcpy(void* dest, void* src, int num)
+{
+    char* d = (char*)dest;
+    char* s = (char*)src;
+    int i;
+    for (i = 0; i < num; i++) {
+        d[i] = s[i];
+    }
+    return dest;
+}
+
+void exit(int status)
+{
+    ExitProcess(status);
+}
+
+int sleep(int seconds)
+{
+    Sleep(seconds * 1000);
+    return 0;
+}
+
+long time()
+{
+    return GetTickCount() / 1000;
+}
+
+// 字符串函数（跨平台实现）
+int strlen(char* str)
+{
+    int len = 0;
+    while (str[len] != 0) len++;
+    return len;
+}
+
+int strcmp(char* str1, char* str2)
+{
+    int i = 0;
+    while (str1[i] != 0 && str2[i] != 0) {
+        if (str1[i] != str2[i]) return str1[i] - str2[i];
+        i++;
+    }
+    return str1[i] - str2[i];
+}
+
+char* strcpy(char* dest, char* src)
+{
+    int i = 0;
+    while (src[i] != 0) {
+        dest[i] = src[i];
+        i++;
+    }
+    dest[i] = 0;
+    return dest;
+}
+
+char* strcat(char* dest, char* src)
+{
+    int dest_len = strlen(dest);
+    int i = 0;
+    while (src[i] != 0) {
+        dest[dest_len + i] = src[i];
+        i++;
+    }
+    dest[dest_len + i] = 0;
+    return dest;
+}

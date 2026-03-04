@@ -1,0 +1,40 @@
+// api.emh - Emerging 语言通用系统API接口
+// 此头文件提供跨平台的系统调用抽象
+
+// 文件操作
+int open(char* path, int flags, int mode);
+int read(int fd, void* buf, int count);
+int write(int fd, void* buf, int count);
+int close(int fd);
+
+// 控制台输出
+void print(char* str);
+void println(char* str);
+void print_int(int num);
+void print_char(char c);
+
+// 内存管理
+void* malloc(int size);
+void free(void* ptr);
+void* memset(void* ptr, int value, int num);
+void* memcpy(void* dest, void* src, int num);
+
+// 进程控制
+void exit(int status);
+int fork();
+int exec(char* path, char** argv);
+
+// 文件系统
+int mkdir(char* path, int mode);
+int chdir(char* path);
+char* getcwd(char* buf, int size);
+
+// 时间
+int sleep(int seconds);
+long time();
+
+// 字符串操作（内置实现，不需要系统调用）
+int strlen(char* str);
+int strcmp(char* str1, char* str2);
+char* strcpy(char* dest, char* src);
+char* strcat(char* dest, char* src);
