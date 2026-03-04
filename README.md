@@ -40,8 +40,6 @@ Deep Learning Corporation 中的 Emerging 内容：https://deeplearning-corporat
 
 编译 emerging.cpp 与 linker.cpp：
 ```batch
-mkdir emerging_toolchain
-cd emerging_toolchain
 cl /EHsc /Fe:emerging.exe emerging.cpp
 cl /EHsc /Fe:linker.exe linker.cpp
 ```
